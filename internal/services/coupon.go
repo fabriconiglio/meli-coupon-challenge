@@ -1,6 +1,7 @@
 package services
 
 import (
+    "sort"
     "sync"
     "meli-coupon/internal/domain"
     "meli-coupon/internal/repository"
@@ -36,15 +37,15 @@ func NewCouponService(meliRepo repository.MeliRepository) CouponService {
 
 // ProcessCoupon procesa la petición del cupón
 func (s *couponService) ProcessCoupon(req domain.CouponRequest) (domain.CouponResponse, error) {
-    // Registrar items como favoritos
+    // Registrar favoritos
     s.stats.registerFavorites(req.ItemIDs)
 
-    // Obtener precios de los items
+    // Obtener precios
     var items []domain.ItemPrice
     for _, id := range req.ItemIDs {
         price, err := s.meliRepo.GetItemPrice(id)
         if err != nil {
-            continue // Ignoramos items con error
+            continue
         }
         items = append(items, domain.ItemPrice{
             ID:    id,
@@ -53,11 +54,12 @@ func (s *couponService) ProcessCoupon(req domain.CouponRequest) (domain.CouponRe
     }
 
     if len(items) == 0 {
-        return domain.CouponResponse{}, ErrorNoValidItems
+        return domain.CouponResponse{}, domain.ErrNoValidItems
     }
 
-    // Calcular mejor combinación
+    // Encontrar mejor combinación y ordenar el resultado
     selectedItems, total := calculator.FindBestCombination(items, req.Amount)
+    sort.Strings(selectedItems)
 
     return domain.CouponResponse{
         ItemIDs: selectedItems,

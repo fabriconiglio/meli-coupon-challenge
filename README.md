@@ -34,7 +34,7 @@ meli-coupon/
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/tu-usuario/meli-coupon.git
+git clone https://github.com/fabriconiglio/meli-coupon-challenge.git
 
 # Entrar al directorio
 cd meli-coupon
@@ -84,7 +84,7 @@ curl http://localhost:8080/coupon/stats
 
 ## Autor
 
-[Tu Nombre]
+Fabrizzio Coniglio
 
 ## Licencia
 

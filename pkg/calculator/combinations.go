@@ -6,7 +6,6 @@ import (
     "meli-coupon/internal/domain"
 )
 
-// FindBestCombination encuentra la mejor combinación de items que no exceda el monto
 func FindBestCombination(items []domain.ItemPrice, amount float64) ([]string, float64) {
     n := len(items)
     bestTotal := 0.0
@@ -33,9 +32,17 @@ func FindBestCombination(items []domain.ItemPrice, amount float64) ([]string, fl
 
         if currentTotal <= amount && currentTotal > bestTotal {
             bestTotal = currentTotal
-            bestComb = currentComb
+            bestComb = make([]string, len(currentComb))
+            copy(bestComb, currentComb)
             log.Printf("Nueva mejor combinación encontrada: %v con total %f", bestComb, bestTotal)
         }
+    }
+
+    // Ordenar el resultado final por ID para mantener consistencia
+    if len(bestComb) > 0 {
+        sort.Strings(bestComb)
+    } else {
+        bestComb = []string{} // Retornar slice vacío en lugar de nil
     }
 
     return bestComb, bestTotal
