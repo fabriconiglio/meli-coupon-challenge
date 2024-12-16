@@ -8,25 +8,27 @@ import (
     "meli-coupon/internal/handlers"
     "meli-coupon/internal/repository"
     "meli-coupon/internal/services"
+    "meli-coupon/internal/cache"
 )
 
 func main() {
-    // Configurar logging
     log.SetFlags(log.LstdFlags | log.Lshortfile)
     
-    // Inicializar dependencias
-    meliRepo := repository.NewMeliRepository()
+    cache := cache.NewMemoryCache()
+    meliRepo := repository.NewMeliRepository(cache)
     couponService := services.NewCouponService(meliRepo)
     couponHandler := handlers.NewCouponHandler(couponService)
 
-    // Configurar router
     router := mux.NewRouter()
     
-    // Registrar rutas
+    // Core endpoints
     router.HandleFunc("/coupon/", couponHandler.HandleCoupon).Methods("POST")
     router.HandleFunc("/coupon/stats", couponHandler.HandleStats).Methods("GET")
     
-    // Configurar servidor
+    // Monitoring endpoints
+    router.HandleFunc("/health", handlers.HealthCheck).Methods("GET")
+    router.HandleFunc("/metrics", handlers.MetricsHandler).Methods("GET")
+    
     srv := &http.Server{
         Handler:      router,
         Addr:         ":8080",

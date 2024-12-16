@@ -7,28 +7,39 @@ import (
     "net/http"
     "log"
     "meli-coupon/internal/domain"
+    "meli-coupon/internal/cache"
+    "meli-coupon/internal/monitoring"
 )
 
-// MeliRepository interface para interactuar con la API de ML
 type MeliRepository interface {
     GetItemPrice(itemID string) (float64, error)
 }
 
 type meliRepository struct {
     baseURL string
+    cache   cache.Cache
 }
 
-// NewMeliRepository crea una nueva instancia del repositorio
-func NewMeliRepository() MeliRepository {
+func NewMeliRepository(cache cache.Cache) MeliRepository {
     return &meliRepository{
         baseURL: "https://api.mercadolibre.com",
+        cache:   cache,
     }
 }
 
-// GetItemPrice obtiene el precio de un item desde la API de ML
 func (r *meliRepository) GetItemPrice(itemID string) (float64, error) {
+    // Intentar obtener del caché
+    if price, found := r.cache.Get(itemID); found {
+        monitoring.RecordCacheHit()
+        log.Printf("Cache hit for item %s: %f", itemID, price)
+        return price, nil
+    }
+
+    monitoring.RecordCacheMiss()
+
+    // Si no está en caché, consultar la API
     url := fmt.Sprintf("%s/items/%s", r.baseURL, itemID)
-    log.Printf("Consultando API de ML: %s", url)
+    log.Printf("Cache miss, consulting API: %s", url)
     
     resp, err := http.Get(url)
     if err != nil {
@@ -54,6 +65,9 @@ func (r *meliRepository) GetItemPrice(itemID string) (float64, error) {
         return 0, fmt.Errorf("precio no encontrado para item %s", itemID)
     }
 
-    log.Printf("Precio obtenido para %s: %f", itemID, item.Price)
+    // Guardar en caché
+    r.cache.Set(itemID, item.Price)
+    log.Printf("Cached price for item %s: %f", itemID, item.Price)
+
     return item.Price, nil
 }

@@ -74,13 +74,88 @@ curl http://localhost:8080/coupon/stats
 4. **Error Handling**: Errores personalizados y descriptivos
 5. **Testing**: Cobertura completa con mocks
 
-## Mejoras Futuras
+# Ejecuta la aplicación como un contenedor de Docker
+```bash
+docker build -t meli-coupon .
+docker run -p 8080:8080 meli-coupon
+```
 
-1. Implementar caché para precios de productos
-2. Agregar métricas y monitoring
-3. Documentación con Swagger
-4. Containerización con Docker
-5. CI/CD pipeline
+## Implementacion de cache
+# Primera petición (sin caché)
+```bash
+curl -X POST http://localhost:8080/coupon/ \
+-H "Content-Type: application/json" \
+-d '{
+    "item_ids": ["MLA1114676780", "MLA1114683943", "MLA1114656461"],
+    "amount": 500000
+}'
+```
+
+# Segunda petición (debería usar caché)
+```bash
+curl -X POST http://localhost:8080/coupon/ \
+-H "Content-Type: application/json" \
+-d '{
+    "item_ids": ["MLA1114676780", "MLA1114683943", "MLA1114656461"],
+    "amount": 500000
+}'
+```
+
+## Agreguemos un endpoint de healthcheck y métricas:
+
+# Healthcheck
+```bash
+curl http://localhost:8080/health
+```
+
+# Métricas
+```bash
+curl http://localhost:8080/metrics
+```
+
+
+## Pasos para desplegar en AWS
+# Instalar AWS CLI
+```bash
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
+```
+
+# Configurar AWS CLI
+```bash
+aws configure
+```
+
+# Instalar EB CLI:
+```bash
+pip install awsebcli
+```
+
+# Inicializar el proyecto en Elastic Beanstalk:
+```bash
+b init -p docker meli-coupon --region us-east-1
+```
+
+# Crear el ambiente:
+```bash
+eb create meli-coupon-prod
+```
+
+# Desplegar:
+```bash
+eb deploy
+```
+
+# Para ver los logs:
+```bash
+eb logs
+```
+
+# Para ver el estado:
+```bash
+eb status
+```
 
 ## Autor
 
