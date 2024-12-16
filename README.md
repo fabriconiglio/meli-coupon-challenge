@@ -6,14 +6,21 @@ API implementada en Go para el challenge de MercadoLibre que optimiza el uso de 
 
 ```
 meli-coupon/
-├── cmd/api/           # Punto de entrada de la aplicación
-├── internal/          # Código privado de la aplicación
-│   ├── domain/       # Modelos y errores
-│   ├── handlers/     # Manejadores HTTP
-│   ├── services/     # Lógica de negocio
-│   └── repository/   # Acceso a datos externos
-└── pkg/              # Código público reutilizable
-    └── calculator/   # Algoritmo de combinaciones
+├── cmd/api/            # Punto de entrada de la aplicación
+├── internal/           # Código privado de la aplicación
+│   ├── domain/         # Modelos y errores
+│   ├── handlers/       # Manejadores HTTP
+│   ├── services/       # Lógica de negocio
+│   └── repository/     # Acceso a datos externos
+├── pkg/                # Código público reutilizable
+│   └── calculator/     # Algoritmo de combinaciones
+├── .ebextensions/      # Configuraciones de Elastic Beanstalk
+│   ├── 01_nginx.config
+│   ├── 01-autoscaling.config
+│   └── launch-template.config
+└── .elasticbeanstalk/  # Archivos de configuración de EB CLI
+    └── config.yml
+
 ```
 
 ## Características
@@ -81,7 +88,7 @@ docker run -p 8080:8080 meli-coupon
 ```
 
 ## Implementacion de cache
-# Primera petición (sin caché)
+## Primera petición (sin caché)
 ```bash
 curl -X POST http://localhost:8080/coupon/ \
 -H "Content-Type: application/json" \
@@ -91,7 +98,7 @@ curl -X POST http://localhost:8080/coupon/ \
 }'
 ```
 
-# Segunda petición (debería usar caché)
+## Segunda petición (debería usar caché)
 ```bash
 curl -X POST http://localhost:8080/coupon/ \
 -H "Content-Type: application/json" \
@@ -103,56 +110,56 @@ curl -X POST http://localhost:8080/coupon/ \
 
 ## Agreguemos un endpoint de healthcheck y métricas:
 
-# Healthcheck
+## Healthcheck
 ```bash
 curl http://localhost:8080/health
 ```
 
-# Métricas
+## Métricas
 ```bash
 curl http://localhost:8080/metrics
 ```
 
 
 ## Pasos para desplegar en AWS
-# Instalar AWS CLI
+## Instalar AWS CLI
 ```bash
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 unzip awscliv2.zip
 sudo ./aws/install
 ```
 
-# Configurar AWS CLI
+## Configurar AWS CLI
 ```bash
 aws configure
 ```
 
-# Instalar EB CLI:
+## Instalar EB CLI:
 ```bash
 pip install awsebcli
 ```
 
-# Inicializar el proyecto en Elastic Beanstalk:
+## Inicializar el proyecto en Elastic Beanstalk:
 ```bash
 b init -p docker meli-coupon --region us-east-1
 ```
 
-# Crear el ambiente:
+## Crear el ambiente:
 ```bash
 eb create meli-coupon-prod
 ```
 
-# Desplegar:
+## Desplegar:
 ```bash
 eb deploy
 ```
 
-# Para ver los logs:
+## Para ver los logs:
 ```bash
 eb logs
 ```
 
-# Para ver el estado:
+## Para ver el estado:
 ```bash
 eb status
 ```
