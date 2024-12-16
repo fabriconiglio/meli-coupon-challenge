@@ -14,12 +14,7 @@ meli-coupon/
 │   └── repository/     # Acceso a datos externos
 ├── pkg/                # Código público reutilizable
 │   └── calculator/     # Algoritmo de combinaciones
-├── .ebextensions/      # Configuraciones de Elastic Beanstalk
-│   ├── 01_nginx.config
-│   ├── 01-autoscaling.config
-│   └── launch-template.config
-└── .elasticbeanstalk/  # Archivos de configuración de EB CLI
-    └── config.yml
+└── fly.toml            # Configuración de Fly.io
 
 ```
 
@@ -56,7 +51,7 @@ go test ./...
 go run cmd/api/main.go
 ```
 
-## Uso
+## Uso Local
 
 ### Calcular mejor combinación de productos:
 ```bash
@@ -121,52 +116,52 @@ curl http://localhost:8080/metrics
 ```
 
 
-## Pasos para desplegar en AWS
-## Instalar AWS CLI
+## Deployment en Fly.io
+## Requisitos
+
+-Cuenta en Fly.io
+-Fly CLI instalado
+
+## Pasos para deployar
+
+1) Instalar Fly CLI:
+
 ```bash
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
+curl -L https://fly.io/install.sh | sh
 ```
 
-## Configurar AWS CLI
+2) Agregar Fly CLI al PATH:
+
 ```bash
-aws configure
+export FLYCTL_INSTALL="/home/$USER/.fly"
+export PATH="$FLYCTL_INSTALL/bin:$PATH"
 ```
 
-## Instalar EB CLI:
+3) Login en Fly:
+
 ```bash
-pip install awsebcli
+flyctl auth login
 ```
 
-## Inicializar el proyecto en Elastic Beanstalk:
+4) Deployar la aplicación:
 ```bash
-b init -p docker meli-coupon --region us-east-1
+flyctl launch
 ```
 
-## Crear el ambiente:
+## URL de la aplicación:
 ```bash
-eb create meli-coupon-prod
+https://meli-coupon-autumn-leaf-7889.fly.dev
 ```
 
-## Desplegar:
+# Healthcheck y Métricas
+## Healthcheck
 ```bash
-eb deploy
+https://meli-coupon-autumn-leaf-7889.fly.dev/health
 ```
 
-## Para ver los logs:
+## Métricas
 ```bash
-eb logs
-```
-
-## Para ver el estado:
-```bash
-eb status
-```
-
-## URL DE AMAZON:
-```bash
-http://meli-coupon-v4-prod.eba-wsjhmumq.us-east-2.elasticbeanstalk.com/
+https://meli-coupon-autumn-leaf-7889.fly.dev/metrics
 ```
 
 ## Autor
