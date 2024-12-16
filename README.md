@@ -164,6 +164,11 @@ eb logs
 eb status
 ```
 
+## URL DE AMAZON:
+```bash
+http://meli-coupon-v4-prod.eba-wsjhmumq.us-east-2.elasticbeanstalk.com/
+```
+
 ## Autor
 
 Fabrizzio Coniglio
