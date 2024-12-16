@@ -119,8 +119,7 @@ curl http://localhost:8080/metrics
 ## Deployment en Fly.io
 ## Requisitos
 
--Cuenta en Fly.io
--Fly CLI instalado
+Cuenta en Fly.io y Fly CLI instalado
 
 ## Pasos para deployar
 
